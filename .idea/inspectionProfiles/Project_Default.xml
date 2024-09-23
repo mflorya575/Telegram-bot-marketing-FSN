@@ -1,0 +1,194 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="LossyEncoding" enabled="true" level="TYPO" enabled_by_default="true" editorAttributes="TYPO" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="4">
+            <item index="0" class="java.lang.String" itemvalue="pip-24.0" />
+            <item index="1" class="java.lang.String" itemvalue="Pillow-10.2.0" />
+            <item index="2" class="java.lang.String" itemvalue="greenlet" />
+            <item index="3" class="java.lang.String" itemvalue="cffi" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="situation_center.main.views.news" />
+          <option value="situation_center.news.utils.news" />
+          <option value="situation_center.news.sitemaps.nathprojects" />
+          <option value="situation_center.api.views.nathprojects" />
+          <option value="situation_center.api.serializers.nathprojects" />
+          <option value="situation_center.api.serializers.Hospital" />
+          <option value="situation_center.api.views.Hospital" />
+          <option value="situation_center.api.views.operdata" />
+          <option value="situation_center.api.views.yeardata" />
+          <option value="situation_center.api.views.Study" />
+          <option value="situation_center.api.serializers.operdata" />
+          <option value="situation_center.api.serializers.yeardata" />
+          <option value="situation_center.api.serializers.Study" />
+          <option value="situation_center.api.serializers.Demographics" />
+          <option value="situation_center.api.urls.DemographicsDetailAPIView" />
+          <option value="situation_center.api.views.Demographics" />
+          <option value="situation_center.api.urls.CultureDetailAPIView" />
+          <option value="situation_center.api.serializers.Culture" />
+          <option value="situation_center.api.views.Culture" />
+          <option value="situation_center.api.serializers.Road" />
+          <option value="situation_center.api.urls.RoadDetailAPIView" />
+          <option value="situation_center.api.views.Road" />
+          <option value="situation_center.api.serializers.Science" />
+          <option value="situation_center.api.views.Science" />
+          <option value="situation_center.api.serializers.Ecology" />
+          <option value="situation_center.api.views.Ecology" />
+          <option value="situation_center.api.serializers.Business" />
+          <option value="situation_center.api.views.Business" />
+          <option value="situation_center.api.serializers.Turism" />
+          <option value="situation_center.api.serializers.House" />
+          <option value="situation_center.api.views.House" />
+          <option value="situation_center.api.serializers.World" />
+          <option value="situation_center.api.views.World" />
+          <option value="situation_center.api.serializers.Labour" />
+          <option value="situation_center.api.views.Labour" />
+          <option value="situation_center.api.views.Atom" />
+          <option value="situation_center.api.serializers.Atom" />
+          <option value="situation_center.api.serializers.Econom" />
+          <option value="situation_center.api.serializers.Mainline" />
+          <option value="situation_center.api.views.Mainline" />
+          <option value="situation_center.api.views.Econom" />
+          <option value="app.migrations.env.DATABASE_URL" />
+          <option value="situation_center.situation_center.urls.news" />
+          <option value="situation_center.activeforecast.views.foresttrees" />
+          <option value="situation_center.activeforecast.views.Hospital" />
+          <option value="situation_center.activeforecast.forms.foresttrees" />
+          <option value="situation_center.activeforecast.forms.Hospital" />
+          <option value="situation_center.ai.views.foresttrees" />
+          <option value="situation_center.ai.views.Hospital" />
+          <option value="situation_center.activeforecast.forms.Study" />
+          <option value="situation_center.activeforecast.views.Study" />
+          <option value="situation_center.activeforecast.views.Demographics" />
+          <option value="situation_center.activeforecast.views.Culture" />
+          <option value="situation_center.activeforecast.views.Road" />
+          <option value="situation_center.activeforecast.views.Science" />
+          <option value="situation_center.activeforecast.views.Ecology" />
+          <option value="situation_center.activeforecast.views.Business" />
+          <option value="situation_center.activeforecast.views.Turism" />
+          <option value="situation_center.activeforecast.views.House" />
+          <option value="situation_center.activeforecast.views.World" />
+          <option value="situation_center.activeforecast.views.Labour" />
+          <option value="situation_center.activeforecast.views.Atom" />
+          <option value="situation_center.activeforecast.views.Econom" />
+          <option value="situation_center.activeforecast.views.Mainline" />
+          <option value="situation_center.activeforecast.views.Industry" />
+          <option value="situation_center.activeforecast.views.Agro" />
+          <option value="situation_center.activeforecast.views.Building" />
+          <option value="situation_center.activeforecast.views.Transport" />
+          <option value="situation_center.activeforecast.views.Trading" />
+          <option value="situation_center.activeforecast.views.Uslugi" />
+          <option value="situation_center.activeforecast.views.Investing" />
+          <option value="situation_center.activeforecast.views.FinPr" />
+          <option value="situation_center.activeforecast.views.Price" />
+          <option value="situation_center.activeforecast.views.ProdPrice" />
+          <option value="situation_center.activeforecast.views.Revenue" />
+          <option value="situation_center.activeforecast.views.Salary" />
+          <option value="situation_center.activeforecast.views.Joblessness" />
+          <option value="situation_center.activeforecast.views.Jobmarket" />
+          <option value="situation_center.activeforecast.views.JobMarket" />
+          <option value="situation_center.activeforecast.views.SmallMediumCompany" />
+          <option value="situation_center.activeforecast.views.Population" />
+          <option value="situation_center.activeforecast.views.LevelHealth" />
+          <option value="situation_center.activeforecast.views.SecureNature" />
+          <option value="situation_center.activeforecast.views.CapitalAssets" />
+          <option value="situation_center.activeforecast.views.Organization" />
+          <option value="situation_center.activeforecast.views.SHLRR" />
+          <option value="situation_center.activeforecast.views.InfoTechnology" />
+          <option value="situation_center.activeforecast.views.Finance" />
+          <option value="situation_center.activeforecast.views.ForeignTrading" />
+          <option value="situation_center.activeforecast.views.VRP" />
+          <option value="situation_center.activeforecast.views.IndustrialProd" />
+          <option value="situation_center.activeforecast.forms.Demographics" />
+          <option value="situation_center.activeforecast.forms.Culture" />
+          <option value="situation_center.activeforecast.forms.Road" />
+          <option value="situation_center.activeforecast.forms.Science" />
+          <option value="situation_center.activeforecast.forms.Ecology" />
+          <option value="situation_center.activeforecast.forms.Business" />
+          <option value="situation_center.activeforecast.forms.Turism" />
+          <option value="situation_center.activeforecast.forms.House" />
+          <option value="situation_center.activeforecast.forms.World" />
+          <option value="situation_center.activeforecast.forms.Labour" />
+          <option value="situation_center.activeforecast.forms.Atom" />
+          <option value="situation_center.activeforecast.forms.Econom" />
+          <option value="situation_center.activeforecast.forms.Mainline" />
+          <option value="situation_center.activeforecast.forms.Industry" />
+          <option value="situation_center.activeforecast.forms.Agro" />
+          <option value="situation_center.activeforecast.forms.Building" />
+          <option value="situation_center.activeforecast.forms.Transport" />
+          <option value="situation_center.activeforecast.forms.Trading" />
+          <option value="situation_center.activeforecast.forms.Uslugi" />
+          <option value="situation_center.activeforecast.forms.Investing" />
+          <option value="situation_center.activeforecast.forms.FinPr" />
+          <option value="situation_center.activeforecast.forms.Price" />
+          <option value="situation_center.activeforecast.forms.ProdPrice" />
+          <option value="situation_center.activeforecast.forms.Revenue" />
+          <option value="situation_center.activeforecast.forms.Salary" />
+          <option value="situation_center.activeforecast.forms.Joblessness" />
+          <option value="situation_center.activeforecast.forms.JobMarket" />
+          <option value="situation_center.activeforecast.forms.SmallMediumCompany" />
+          <option value="situation_center.activeforecast.forms.Population" />
+          <option value="situation_center.activeforecast.forms.LevelHealth" />
+          <option value="situation_center.activeforecast.forms.SecureNature" />
+          <option value="situation_center.activeforecast.forms.CapitalAssets" />
+          <option value="situation_center.activeforecast.forms.Organization" />
+          <option value="situation_center.activeforecast.forms.SHLRR" />
+          <option value="situation_center.activeforecast.forms.InfoTechnology" />
+          <option value="situation_center.activeforecast.forms.Finance" />
+          <option value="situation_center.activeforecast.forms.ForeignTrading" />
+          <option value="situation_center.activeforecast.forms.VRP" />
+          <option value="situation_center.activeforecast.forms.IndustrialProd" />
+          <option value="situation_center.ai.views.Study" />
+          <option value="situation_center.ai.views.Demographics" />
+          <option value="situation_center.ai.views.Culture" />
+          <option value="situation_center.ai.views.Road" />
+          <option value="situation_center.ai.views.Science" />
+          <option value="situation_center.ai.views.Ecology" />
+          <option value="situation_center.ai.views.Business" />
+          <option value="situation_center.ai.views.Turism" />
+          <option value="situation_center.ai.views.House" />
+          <option value="situation_center.ai.views.World" />
+          <option value="situation_center.ai.views.Labour" />
+          <option value="situation_center.ai.views.Atom" />
+          <option value="situation_center.ai.views.Econom" />
+          <option value="situation_center.ai.views.Mainline" />
+          <option value="situation_center.ai.views.Industry" />
+          <option value="situation_center.ai.views.Agro" />
+          <option value="situation_center.ai.views.Building" />
+          <option value="situation_center.ai.views.Transport" />
+          <option value="situation_center.ai.views.Trading" />
+          <option value="situation_center.ai.views.Uslugi" />
+          <option value="situation_center.ai.views.Investing" />
+          <option value="situation_center.ai.views.FinPr" />
+          <option value="situation_center.ai.views.Price" />
+          <option value="situation_center.ai.views.ProdPrice" />
+          <option value="situation_center.ai.views.Revenue" />
+          <option value="situation_center.ai.views.Salary" />
+          <option value="situation_center.ai.views.Joblessness" />
+          <option value="situation_center.ai.views.JobMarket" />
+          <option value="situation_center.ai.views.SmallMediumCompany" />
+          <option value="situation_center.ai.views.Population" />
+          <option value="situation_center.ai.views.LevelHealth" />
+          <option value="situation_center.ai.views.SecureNature" />
+          <option value="situation_center.ai.views.CapitalAssets" />
+          <option value="situation_center.ai.views.Organization" />
+          <option value="situation_center.ai.views.SHLRR" />
+          <option value="situation_center.ai.views.InfoTechnology" />
+          <option value="situation_center.ai.views.Finance" />
+          <option value="situation_center.ai.views.ForeignTrading" />
+          <option value="situation_center.ai.views.VRP" />
+          <option value="situation_center.ai.views.IndustrialProd" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
