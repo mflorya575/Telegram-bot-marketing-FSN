@@ -35,7 +35,7 @@ catalog_kb = InlineKeyboardMarkup(
 buy_kb = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Написать", url = "https://t.me/jlosos1856"),
+            InlineKeyboardButton(text="Написать", url="https://t.me/durov"),
         ],
     ]
 )
