@@ -230,14 +230,14 @@ async def handle_file(message: types.Message):
 @dp.message_handler(content_types=[types.ContentType.DOCUMENT])
 async def handle_excel_file(message: types.Message):
     # Проверяем, что файл - это Excel
-    if message.document.mime_type in ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel']:
+    if message.document.mime_type in ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                      'application/vnd.ms-excel']:
         # Скачиваем файл
         file_info = await bot.get_file(message.document.file_id)
         file_path = file_info.file_path
         file = await bot.download_file(file_path)
 
         # Чтение файла Excel в pandas
-        # Прямо используем file как объект BytesIO
         data = pd.read_excel(io.BytesIO(file.read()), header=0)
 
         # Проверка на наличие данных
@@ -254,37 +254,54 @@ async def handle_excel_file(message: types.Message):
             await message.reply("Количество дат не совпадает с количеством значений.")
             return
 
-        # Создаем фигуру для дашборда с двумя графиками
-        fig, axs = plt.subplots(2, 1, figsize=(10, 12))
-
-        # Первый график: линейная диаграмма
+        # Создаем фигуру для линейной диаграммы
+        fig1, ax1 = plt.subplots(figsize=(10, 6))
         for i, row in enumerate(values):
-            axs[0].plot(dates, row, label=f'Строка {i + 1}')
+            ax1.plot(dates, row, label=f'Строка {i + 1}')
 
-        axs[0].set_title('Линейная визуализация данных из Excel')
-        axs[0].set_xlabel('Даты')
-        axs[0].set_ylabel('Значения')
-        axs[0].legend(loc='center left', bbox_to_anchor=(1, 0.5))
-        axs[0].grid(True)
+        ax1.set_title('Линейная визуализация данных из Excel')
+        ax1.set_xlabel('Даты')
+        ax1.set_ylabel('Значения')
+        ax1.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        ax1.grid(True)
 
-        # Второй график: столбчатая диаграмма
-        summed_values = values.sum(axis=0)  # Суммируем значения по строкам
-        axs[1].bar(dates, summed_values)
-        axs[1].set_title('Столбчатая диаграмма суммарных значений по датам')
-        axs[1].set_xlabel('Даты')
-        axs[1].set_ylabel('Сумма значений')
-
-        # Сохраняем дашборд в байтовый объект для отправки
-        dashboard_stream = io.BytesIO()
+        # Сохраняем линейный график в байтовый объект для отправки
+        linear_stream = io.BytesIO()
         plt.tight_layout()
-        plt.savefig(dashboard_stream, format='png', bbox_inches='tight')
-        dashboard_stream.seek(0)
+        plt.savefig(linear_stream, format='png', bbox_inches='tight')
+        linear_stream.seek(0)
+        await message.answer_photo(photo=linear_stream)  # Отправляем линейный график
+        plt.close(fig1)  # Закрываем фигуру
 
-        # Отправляем дашборд пользователю
-        await message.answer_photo(photo=dashboard_stream)
+        # Создаем фигуру для столбчатой диаграммы
+        fig2, ax2 = plt.subplots(figsize=(10, 6))
+        summed_values = values.sum(axis=0)  # Суммируем значения по строкам
+        ax2.bar(dates, summed_values)
+        ax2.set_title('Столбчатая диаграмма суммарных значений по датам')
+        ax2.set_xlabel('Даты')
+        ax2.set_ylabel('Сумма значений')
 
-        # Закрываем график, чтобы очистить память
-        plt.close(fig)
+        # Сохраняем столбчатый график в байтовый объект для отправки
+        bar_stream = io.BytesIO()
+        plt.tight_layout()
+        plt.savefig(bar_stream, format='png', bbox_inches='tight')
+        bar_stream.seek(0)
+        await message.answer_photo(photo=bar_stream)  # Отправляем столбчатый график
+        plt.close(fig2)  # Закрываем фигуру
+
+        # Создаем фигуру для круговой диаграммы
+        fig3, ax3 = plt.subplots(figsize=(10, 6))
+        total_values = summed_values  # Используем суммы значений для круговой диаграммы
+        ax3.pie(total_values, labels=dates, autopct='%1.1f%%', startangle=90)
+        ax3.set_title('Круговая диаграмма распределения значений по датам')
+
+        # Сохраняем круговой график в байтовый объект для отправки
+        pie_stream = io.BytesIO()
+        plt.tight_layout()
+        plt.savefig(pie_stream, format='png', bbox_inches='tight')
+        pie_stream.seek(0)
+        await message.answer_photo(photo=pie_stream)  # Отправляем круговой график
+        plt.close(fig3)  # Закрываем фигуру
     else:
         await message.reply("Пожалуйста, отправьте файл в формате Excel.")
 
