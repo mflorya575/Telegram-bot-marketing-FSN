@@ -66,41 +66,64 @@ async def handle_file(message: types.Message):
         dates = data.columns.values[1:]  # Первый столбец пропускаем, если это не даты
         values = data.iloc[:, 1:].values  # Берем все строки, начиная со второго столбца
 
-        # Создаем фигуру для дашборда с тремя графиками
-        fig, axs = plt.subplots(3, 1, figsize=(10, 18))
+        # Отправляем три отдельных графика
 
         # Первый график: линейная диаграмма
+        fig, ax = plt.subplots(figsize=(10, 6))
         for i, row in enumerate(values):
-            axs[0].plot(dates, row, label=f'Строка {i + 1}')
+            ax.plot(dates, row, label=f'Строка {i + 1}')
 
-        axs[0].set_title('Линейная визуализация данных из CSV')
-        axs[0].set_xlabel('Даты')
-        axs[0].set_ylabel('Значения')
-        axs[0].legend(loc='center left', bbox_to_anchor=(1, 0.5))  # Легенда справа от графика
-        axs[0].grid(True)
+        ax.set_title('Линейная визуализация данных из CSV')
+        ax.set_xlabel('Даты')
+        ax.set_ylabel('Значения')
+        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))  # Легенда справа от графика
+        ax.grid(True)
+
+        # Сохраняем первый график в байтовый объект
+        line_chart_stream = io.BytesIO()
+        plt.savefig(line_chart_stream, format='png', bbox_inches='tight')
+        line_chart_stream.seek(0)
+
+        # Отправляем первый график пользователю
+        await message.answer_photo(photo=line_chart_stream)
+
+        # Закрываем первый график
+        plt.close(fig)
 
         # Второй график: столбчатая диаграмма (Bar Chart)
+        fig, ax = plt.subplots(figsize=(10, 6))
         summed_values = data.iloc[:, 1:].sum()  # Суммируем значения по строкам
-        axs[1].bar(dates, summed_values)
-        axs[1].set_title('Столбчатая диаграмма суммарных значений по датам')
-        axs[1].set_xlabel('Даты')
-        axs[1].set_ylabel('Сумма значений')
+        ax.bar(dates, summed_values)
+        ax.set_title('Столбчатая диаграмма суммарных значений по датам')
+        ax.set_xlabel('Даты')
+        ax.set_ylabel('Сумма значений')
+
+        # Сохраняем второй график в байтовый объект
+        bar_chart_stream = io.BytesIO()
+        plt.savefig(bar_chart_stream, format='png', bbox_inches='tight')
+        bar_chart_stream.seek(0)
+
+        # Отправляем второй график пользователю
+        await message.answer_photo(photo=bar_chart_stream)
+
+        # Закрываем второй график
+        plt.close(fig)
 
         # Третий график: круговая диаграмма (Pie Chart)
+        fig, ax = plt.subplots(figsize=(10, 6))
         total_values = summed_values  # Используем суммы значений для круговой диаграммы
-        axs[2].pie(total_values, labels=dates, autopct='%1.1f%%', startangle=90)
-        axs[2].set_title('Круговая диаграмма распределения значений по датам')
+        ax.pie(total_values, labels=dates, autopct='%1.1f%%', startangle=90)
+        ax.set_title('Круговая диаграмма распределения значений по датам')
 
-        # Сохраняем дашборд в байтовый объект для отправки
-        dashboard_stream = io.BytesIO()
-        plt.tight_layout()  # Для корректного отображения элементов
-        plt.savefig(dashboard_stream, format='png', bbox_inches='tight')
-        dashboard_stream.seek(0)
+        # Сохраняем третий график в байтовый объект
+        pie_chart_stream = io.BytesIO()
+        plt.savefig(pie_chart_stream, format='png', bbox_inches='tight')
+        pie_chart_stream.seek(0)
 
-        # Отправляем дашборд пользователю
-        await message.answer_photo(photo=dashboard_stream)
+        # Отправляем третий график пользователю
+        await message.answer_photo(photo=pie_chart_stream)
 
-        # Закрываем график, чтобы очистить память
+        # Закрываем третий график
         plt.close(fig)
     else:
         await message.reply("Пожалуйста, отправьте файл в формате CSV.")
