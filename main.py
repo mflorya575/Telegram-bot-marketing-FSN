@@ -11,7 +11,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import pandas as pd
 import matplotlib.pyplot as plt
 import io
-from sklearn.tree import DecisionTreeClassifier, plot_tree, DecisionTreeRegressor 
+from sklearn.tree import DecisionTreeClassifier, plot_tree, DecisionTreeRegressor
 import requests as requests
 from bs4 import BeautifulSoup
 
