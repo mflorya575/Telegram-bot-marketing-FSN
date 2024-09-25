@@ -11,6 +11,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import pandas as pd
 import matplotlib.pyplot as plt
 import io
+from sklearn.tree import DecisionTreeClassifier, plot_tree
 import requests as requests
 from bs4 import BeautifulSoup
 
@@ -218,6 +219,50 @@ async def handle_file(message: types.Message):
         await message.answer_photo(photo=pie_chart_stream)
         plt.close(fig)  # Закрываем третий график
 
+        # Диаграмма Ганта (Gantt Chart)
+        fig, ax = plt.subplots(figsize=(10, 6))
+        for i, row in enumerate(values):
+            ax.barh(dates, row, label=f'Строка {i + 1}')
+
+        ax.set_title('Диаграмма Ганта')
+        ax.set_xlabel('Значения')
+        ax.set_ylabel('Даты')
+        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.xticks(rotation=45)
+
+        # Сохраняем диаграмму Ганта в байтовый объект
+        gantt_chart_stream = io.BytesIO()
+        plt.savefig(gantt_chart_stream, format='png', bbox_inches='tight')
+        gantt_chart_stream.seek(0)
+
+        # Отправляем диаграмму Ганта пользователю
+        await message.answer_photo(photo=gantt_chart_stream)
+        plt.close(fig)  # Закрываем диаграмму Ганта
+
+        # Дерево решений
+        # Предположим, что первый столбец - это целевая переменная, а остальные - признаки
+        if values.shape[1] > 1:
+            X = data.iloc[:, 1:].values  # Признаки
+            y = data.iloc[:, 0].values    # Целевая переменная
+
+            # Обучаем дерево решений
+            clf = DecisionTreeClassifier(random_state=0)
+            clf.fit(X, y)
+
+            # Визуализация дерева решений
+            fig, ax = plt.subplots(figsize=(10, 6))
+            plot_tree(clf, filled=True, ax=ax, feature_names=data.columns[1:], class_names=list(map(str, set(y))), rounded=True)
+            ax.set_title('Дерево решений')
+
+            # Сохраняем дерево решений в байтовый объект
+            tree_stream = io.BytesIO()
+            plt.savefig(tree_stream, format='png', bbox_inches='tight')
+            tree_stream.seek(0)
+
+            # Отправляем дерево решений пользователю
+            await message.answer_photo(photo=tree_stream)
+            plt.close(fig)  # Закрываем фигуру дерева решений
+
     # Проверяем, что файл - это Excel
     elif message.document.mime_type in ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                                          'application/vnd.ms-excel']:
@@ -286,6 +331,49 @@ async def handle_file(message: types.Message):
         pie_stream.seek(0)
         await message.answer_photo(photo=pie_stream)  # Отправляем круговой график
         plt.close(fig3)  # Закрываем фигуру
+
+        # Диаграмма Ганта
+        fig, ax = plt.subplots(figsize=(10, 6))
+        for i, row in enumerate(values):
+            ax.barh(dates, row, label=f'Строка {i + 1}')
+
+        ax.set_title('Диаграмма Ганта')
+        ax.set_xlabel('Значения')
+        ax.set_ylabel('Даты')
+        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        plt.xticks(rotation=45)
+
+        # Сохраняем диаграмму Ганта в байтовый объект
+        gantt_chart_stream = io.BytesIO()
+        plt.savefig(gantt_chart_stream, format='png', bbox_inches='tight')
+        gantt_chart_stream.seek(0)
+
+        # Отправляем диаграмму Ганта пользователю
+        await message.answer_photo(photo=gantt_chart_stream)
+        plt.close(fig)  # Закрываем диаграмму Ганта
+
+        # Дерево решений
+        if values.shape[1] > 1:
+            X = data.iloc[:, 1:].values  # Признаки
+            y = data.iloc[:, 0].values    # Целевая переменная
+
+            # Обучаем дерево решений
+            clf = DecisionTreeClassifier(random_state=0)
+            clf.fit(X, y)
+
+            # Визуализация дерева решений
+            fig, ax = plt.subplots(figsize=(10, 6))
+            plot_tree(clf, filled=True, ax=ax, feature_names=data.columns[1:], class_names=list(map(str, set(y))), rounded=True)
+            ax.set_title('Дерево решений')
+
+            # Сохраняем дерево решений в байтовый объект
+            tree_stream = io.BytesIO()
+            plt.savefig(tree_stream, format='png', bbox_inches='tight')
+            tree_stream.seek(0)
+
+            # Отправляем дерево решений пользователю
+            await message.answer_photo(photo=tree_stream)
+            plt.close(fig)  # Закрываем фигуру дерева решений
 
     else:
         await message.reply("Пожалуйста, отправьте файл в формате CSV или Excel.")
