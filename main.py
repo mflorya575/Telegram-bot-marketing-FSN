@@ -66,29 +66,37 @@ async def handle_file(message: types.Message):
         dates = data.columns.values[1:]  # Первый столбец пропускаем, если это не даты
         values = data.iloc[:, 1:].values  # Берем все строки, начиная со второго столбца
 
-        # Строим график
-        plt.figure(figsize=(10, 6))
+        # Создаем фигуру для дашборда с двумя графиками
+        fig, axs = plt.subplots(2, 1, figsize=(10, 12))
+
+        # Первый график: линейная диаграмма
         for i, row in enumerate(values):
-            plt.plot(dates, row, label=f'Строка {i + 1}')
+            axs[0].plot(dates, row, label=f'Строка {i + 1}')
 
-        plt.title('Визуализация данных из CSV')
-        plt.xlabel('Даты')
-        plt.ylabel('Значения')
-        plt.grid(True)
+        axs[0].set_title('Линейная визуализация данных из CSV')
+        axs[0].set_xlabel('Даты')
+        axs[0].set_ylabel('Значения')
+        axs[0].legend(loc='center left', bbox_to_anchor=(1, 0.5))  # Легенда справа от графика
+        axs[0].grid(True)
 
-        # Размещение легенды справа от графика
-        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))  # Легенда справа от графика
+        # Второй график: столбчатая диаграмма (Bar Chart)
+        summed_values = data.iloc[:, 1:].sum()  # Суммируем значения по строкам
+        axs[1].bar(dates, summed_values)
+        axs[1].set_title('Столбчатая диаграмма суммарных значений по датам')
+        axs[1].set_xlabel('Даты')
+        axs[1].set_ylabel('Сумма значений')
 
-        # Сохраняем график в байтовый объект для отправки
-        image_stream = io.BytesIO()
-        plt.savefig(image_stream, format='png', bbox_inches='tight')  # Сохранение с учетом всех элементов
-        image_stream.seek(0)  # Возвращаем курсор в начало файла
+        # Сохраняем дашборд в байтовый объект для отправки
+        dashboard_stream = io.BytesIO()
+        plt.tight_layout()  # Для корректного отображения элементов
+        plt.savefig(dashboard_stream, format='png', bbox_inches='tight')
+        dashboard_stream.seek(0)
 
-        # Отправляем изображение пользователю
-        await message.answer_photo(photo=image_stream)
+        # Отправляем дашборд пользователю
+        await message.answer_photo(photo=dashboard_stream)
 
         # Закрываем график, чтобы очистить память
-        plt.close()
+        plt.close(fig)
     else:
         await message.reply("Пожалуйста, отправьте файл в формате CSV.")
 
