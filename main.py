@@ -6,6 +6,10 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
+import pandas as pd
+import matplotlib.pyplot as plt
+import io
+
 from keyboards import *
 import texts
 
@@ -44,6 +48,49 @@ async def help_send(message):
 @dp.message_handler(Text(equals=['📊 Исследования']))
 async def send_price_list(message):
     await message.answer('<b>Выберите интересующую вас услугу</b>', parse_mode='HTML', reply_markup=catalog_kb)
+
+
+@dp.message_handler(content_types=[types.ContentType.DOCUMENT])
+async def handle_file(message: types.Message):
+    # Проверяем, что файл - это CSV
+    if message.document.mime_type == 'text/csv':
+        # Скачиваем файл
+        file_info = await bot.get_file(message.document.file_id)
+        file_path = file_info.file_path
+        file = await bot.download_file(file_path)
+
+        # Чтение файла CSV в pandas
+        data = pd.read_csv(file)
+
+        # Предполагаем, что первая строка — это даты, остальные строки — числовые значения
+        dates = data.columns.values[1:]  # Первый столбец пропускаем, если это не даты
+        values = data.iloc[:, 1:].values  # Берем все строки, начиная со второго столбца
+
+        # Строим график
+        plt.figure(figsize=(10, 6))
+        for i, row in enumerate(values):
+            plt.plot(dates, row, label=f'Строка {i + 1}')
+
+        plt.title('Визуализация данных из CSV')
+        plt.xlabel('Даты')
+        plt.ylabel('Значения')
+        plt.grid(True)
+
+        # Размещение легенды справа от графика
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))  # Легенда справа от графика
+
+        # Сохраняем график в байтовый объект для отправки
+        image_stream = io.BytesIO()
+        plt.savefig(image_stream, format='png', bbox_inches='tight')  # Сохранение с учетом всех элементов
+        image_stream.seek(0)  # Возвращаем курсор в начало файла
+
+        # Отправляем изображение пользователю
+        await message.answer_photo(photo=image_stream)
+
+        # Закрываем график, чтобы очистить память
+        plt.close()
+    else:
+        await message.reply("Пожалуйста, отправьте файл в формате CSV.")
 
 
 if __name__ == '__main__':
