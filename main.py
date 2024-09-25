@@ -1,3 +1,4 @@
+import aiohttp
 from aiogram import Bot, Dispatcher, executor, types
 import asyncio
 import logging
@@ -5,10 +6,13 @@ from aiogram.dispatcher.filters import Command, Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import pandas as pd
 import matplotlib.pyplot as plt
 import io
+import requests as requests
+from bs4 import BeautifulSoup
 
 from keyboards import *
 import texts
@@ -18,6 +22,12 @@ api = '7793599961:AAF9TpoAN_-gBdbV4q_-I02M0xU_FX8L2Ik'
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=api)
 dp = Dispatcher(bot, storage=MemoryStorage())
+
+# Список для хранения ссылок на статьи
+article_links = []
+
+# URL сайта для парсинга
+URL = "https://www.sostav.ru/news/marketing"
 
 
 @dp.message_handler(commands=['start'])
@@ -30,7 +40,8 @@ async def send_menu(message: types.Message):
     # Отправляем список доступных команд
     await message.answer(
         "📋 Меню команд:\n"
-        "/start - Перезапуск бота\n",
+        "/start - Перезапуск бота\n"
+        "/parse - Парсинг статей с сайта маркетинговых исследований",
         reply_markup=start_kb
     )
 
@@ -44,10 +55,85 @@ async def send_info(message):
 async def help_send(message):
     await message.answer('<b>Если есть вопросы</b>', parse_mode='HTML', reply_markup=buy_kb)
 
+# ----------------------------------------------------
 
+
+@dp.message_handler(commands=['parse'])
+async def manual_parse(message: types.Message):
+    await parse_new_articles()
+    await message.reply("Парсинг завершён.")
+
+
+# Асинхронная функция для парсинга сайта и получения новых статей
+async def parse_new_articles():
+    global article_links
+    logging.info("Начинаем парсинг сайта...")
+
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(URL) as response:
+                logging.info(f"Статус ответа: {response.status}")
+                if response.status == 200:
+                    html = await response.text()
+
+                    # Вывод первых 500 символов страницы для проверки
+                    logging.info("HTML содержимое страницы: %s", html[:500])
+
+                    soup = BeautifulSoup(html, "html.parser")
+
+                    # Поиск статей с проверкой селектора
+                    articles = soup.find_all('a', class_='title')
+                    logging.info(f"Найдено статей: {len(articles)}")
+
+                    # Печатаем заголовки для проверки
+                    logging.info("Заголовки статей:")
+                    for article in articles:
+                        logging.info(article.get_text(strip=True))
+
+                    # Очищаем старые ссылки и обновляем их новыми
+                    article_links = []
+                    for article in articles[:10]:  # Возьмем первые 10 статей
+                        title = article.get_text(strip=True)  # Получаем заголовок статьи, очищая лишние пробелы
+                        # Проверяем, начинается ли ссылка с 'http'
+                        link = article['href'] if article['href'].startswith('http') else URL + article['href']
+
+                        # Заменяем 'news/marketing' на 'publication/' в ссылке
+                        if 'news/marketing' in link:
+                            link = link.replace('news/marketing', '')
+
+                        article_links.append((title, link))  # Добавляем заголовок и ссылку в список
+                        logging.info(f"Добавлена статья: {title} - {link}")
+                else:
+                    logging.error(f"Ошибка запроса: {response.status}")
+        except Exception as e:
+            logging.error(f"Ошибка при парсинге: {e}")
+
+
+# Функция для создания клавиатуры с новыми ссылками
+def get_catalog_keyboard():
+    catalog_kb = InlineKeyboardMarkup()
+    for title, link in article_links:
+        catalog_kb.add(InlineKeyboardButton(text=title, url=link))
+    return catalog_kb
+
+
+# Хэндлер, который отвечает за вывод кнопок
 @dp.message_handler(Text(equals=['📊 Исследования']))
-async def send_price_list(message):
-    await message.answer('<b>Выберите интересующую вас услугу</b>', parse_mode='HTML', reply_markup=catalog_kb)
+async def send_price_list(message: types.Message):
+    if not article_links:
+        await message.answer('Ссылки на статьи пока недоступны. Попробуйте позже.')
+    else:
+        await message.answer('<b>Выберите интересующую вас статью</b>', parse_mode='HTML',
+                             reply_markup=get_catalog_keyboard())
+
+
+# Запуск парсера с периодичностью в 1 час
+async def on_startup(dp):
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(parse_new_articles, 'interval', minutes=1)  # Парсим сайт раз в час
+    scheduler.start()
+
+#------------------------------------------------------
 
 
 @dp.message_handler(content_types=[types.ContentType.DOCUMENT])
