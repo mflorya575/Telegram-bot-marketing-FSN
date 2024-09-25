@@ -230,22 +230,32 @@ async def handle_file(message: types.Message):
 @dp.message_handler(content_types=[types.ContentType.DOCUMENT])
 async def handle_excel_file(message: types.Message):
     # Проверяем, что файл - это Excel
-    if message.document.mime_type in ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                                        'application/vnd.ms-excel']:
+    if message.document.mime_type in ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel']:
         # Скачиваем файл
         file_info = await bot.get_file(message.document.file_id)
         file_path = file_info.file_path
         file = await bot.download_file(file_path)
 
         # Чтение файла Excel в pandas
-        data = pd.read_excel(file)
+        # Прямо используем file как объект BytesIO
+        data = pd.read_excel(io.BytesIO(file.read()), header=0)
+
+        # Проверка на наличие данных
+        if data.empty:
+            await message.reply("Файл пустой или не содержит ожидаемых данных.")
+            return
 
         # Предполагаем, что первая строка — это даты, остальные строки — числовые значения
-        dates = data.columns.values  # Все столбцы (даты)
-        values = data.values[1:]  # Все строки, начиная со второго
+        dates = data.columns[1:]  # Получаем названия колонок с датами
+        values = data.iloc[:, 1:].values  # Берем все строки, начиная со второго столбца
 
-        # Создаем фигуру для дашборда с тремя графиками
-        fig, axs = plt.subplots(3, 1, figsize=(10, 18))
+        # Проверка соответствия форматов
+        if len(dates) != values.shape[1]:
+            await message.reply("Количество дат не совпадает с количеством значений.")
+            return
+
+        # Создаем фигуру для дашборда с двумя графиками
+        fig, axs = plt.subplots(2, 1, figsize=(10, 12))
 
         # Первый график: линейная диаграмма
         for i, row in enumerate(values):
@@ -254,24 +264,19 @@ async def handle_excel_file(message: types.Message):
         axs[0].set_title('Линейная визуализация данных из Excel')
         axs[0].set_xlabel('Даты')
         axs[0].set_ylabel('Значения')
-        axs[0].legend(loc='center left', bbox_to_anchor=(1, 0.5))  # Легенда справа от графика
+        axs[0].legend(loc='center left', bbox_to_anchor=(1, 0.5))
         axs[0].grid(True)
 
-        # Второй график: столбчатая диаграмма (Bar Chart)
-        summed_values = data.iloc[1:].sum()  # Суммируем значения по строкам
-        axs[1].bar(dates[1:], summed_values)  # Используем dates[1:], чтобы пропустить первый заголовок
+        # Второй график: столбчатая диаграмма
+        summed_values = values.sum(axis=0)  # Суммируем значения по строкам
+        axs[1].bar(dates, summed_values)
         axs[1].set_title('Столбчатая диаграмма суммарных значений по датам')
         axs[1].set_xlabel('Даты')
         axs[1].set_ylabel('Сумма значений')
 
-        # Третий график: круговая диаграмма (Pie Chart)
-        total_values = summed_values  # Используем суммы значений для круговой диаграммы
-        axs[2].pie(total_values, labels=dates[1:], autopct='%1.1f%%', startangle=90)
-        axs[2].set_title('Круговая диаграмма распределения значений по датам')
-
         # Сохраняем дашборд в байтовый объект для отправки
         dashboard_stream = io.BytesIO()
-        plt.tight_layout()  # Для корректного отображения элементов
+        plt.tight_layout()
         plt.savefig(dashboard_stream, format='png', bbox_inches='tight')
         dashboard_stream.seek(0)
 
@@ -281,7 +286,7 @@ async def handle_excel_file(message: types.Message):
         # Закрываем график, чтобы очистить память
         plt.close(fig)
     else:
-        await message.reply("Пожалуйста, отправьте файл в формате Excel (.xlsx).")
+        await message.reply("Пожалуйста, отправьте файл в формате Excel.")
 
 
 if __name__ == '__main__':
