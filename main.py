@@ -150,15 +150,15 @@ async def on_startup(dp):
 
 @dp.message_handler(content_types=[types.ContentType.DOCUMENT])
 async def handle_file(message: types.Message):
+    # Скачиваем файл
+    file_info = await bot.get_file(message.document.file_id)
+    file_path = file_info.file_path
+    file = await bot.download_file(file_path)
+
     # Проверяем, что файл - это CSV
     if message.document.mime_type == 'text/csv':
-        # Скачиваем файл
-        file_info = await bot.get_file(message.document.file_id)
-        file_path = file_info.file_path
-        file = await bot.download_file(file_path)
-
         # Чтение файла CSV в pandas
-        data = pd.read_csv(file)
+        data = pd.read_csv(io.BytesIO(file.read()))
 
         # Предполагаем, что первая строка — это даты, остальные строки — числовые значения
         dates = data.columns.values[1:]  # Первый столбец пропускаем, если это не даты
@@ -184,9 +184,7 @@ async def handle_file(message: types.Message):
 
         # Отправляем первый график пользователю
         await message.answer_photo(photo=line_chart_stream)
-
-        # Закрываем первый график
-        plt.close(fig)
+        plt.close(fig)  # Закрываем первый график
 
         # Второй график: столбчатая диаграмма (Bar Chart)
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -203,9 +201,7 @@ async def handle_file(message: types.Message):
 
         # Отправляем второй график пользователю
         await message.answer_photo(photo=bar_chart_stream)
-
-        # Закрываем второй график
-        plt.close(fig)
+        plt.close(fig)  # Закрываем второй график
 
         # Третий график: круговая диаграмма (Pie Chart)
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -220,23 +216,11 @@ async def handle_file(message: types.Message):
 
         # Отправляем третий график пользователю
         await message.answer_photo(photo=pie_chart_stream)
+        plt.close(fig)  # Закрываем третий график
 
-        # Закрываем третий график
-        plt.close(fig)
-    else:
-        await message.reply("Пожалуйста, отправьте файл в формате CSV.")
-
-
-@dp.message_handler(content_types=[types.ContentType.DOCUMENT])
-async def handle_excel_file(message: types.Message):
     # Проверяем, что файл - это Excel
-    if message.document.mime_type in ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                                      'application/vnd.ms-excel']:
-        # Скачиваем файл
-        file_info = await bot.get_file(message.document.file_id)
-        file_path = file_info.file_path
-        file = await bot.download_file(file_path)
-
+    elif message.document.mime_type in ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                         'application/vnd.ms-excel']:
         # Чтение файла Excel в pandas
         data = pd.read_excel(io.BytesIO(file.read()), header=0)
 
@@ -302,8 +286,9 @@ async def handle_excel_file(message: types.Message):
         pie_stream.seek(0)
         await message.answer_photo(photo=pie_stream)  # Отправляем круговой график
         plt.close(fig3)  # Закрываем фигуру
+
     else:
-        await message.reply("Пожалуйста, отправьте файл в формате Excel.")
+        await message.reply("Пожалуйста, отправьте файл в формате CSV или Excel.")
 
 
 if __name__ == '__main__':
