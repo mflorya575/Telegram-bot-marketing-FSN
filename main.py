@@ -39,11 +39,23 @@ async def start(message):
 async def send_menu(message: types.Message):
     # Отправляем список доступных команд
     await message.answer(
-        "📋 Меню команд:\n"
+        "📋 Команды бота:\n"
         "/start - Перезапуск бота\n"
-        "/parse - Парсинг статей с сайта маркетинговых исследований",
+        "/parse - Парсинг статей с сайта маркетинговых исследований\n"
+        "/help - Показать это сообщение с доступными командами.\n",
         reply_markup=start_kb
     )
+
+
+@dp.message_handler(commands=['help'])
+async def send_help(message: types.Message):
+    help_text = (
+        "<b>Команды бота:</b>\n\n"
+        "/start - Перезапуск бота\n"
+        "/parse - Парсинг статей с сайта маркетинговых исследований.\n"
+        "/help - Показать это сообщение с доступными командами.\n"
+    )
+    await message.answer(help_text, parse_mode='HTML')
 
 
 @dp.message_handler(Text(equals=['ℹ️ О нас']))
@@ -130,7 +142,7 @@ async def send_price_list(message: types.Message):
 # Запуск парсера с периодичностью в 1 час
 async def on_startup(dp):
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(parse_new_articles, 'interval', minutes=1)  # Парсим сайт раз в час
+    scheduler.add_job(parse_new_articles, 'interval', hours=1)  # Парсим сайт раз в час
     scheduler.start()
 
 #------------------------------------------------------
