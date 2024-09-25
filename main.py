@@ -7,6 +7,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import os
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -43,7 +44,8 @@ async def send_menu(message: types.Message):
         "📋 <b>Команды бота:</b>\n"
         "/start - Перезапуск бота.\n"
         "/parse - Парсинг статей с сайта маркетинговых исследований. Затем можно нажимать на кнопку Исследования.\n"
-        "/help - Показать это сообщение с доступными командами.\n",
+        "/help - Показать это сообщение с доступными командами.\n"
+        "/csv - Видео-пример, как работать с <b>csv</b> файлом.\n",
         reply_markup=start_kb, parse_mode='HTML'
     )
 
@@ -55,8 +57,22 @@ async def send_help(message: types.Message):
         "/start - Перезапуск бота.\n"
         "/parse - Парсинг статей с сайта маркетинговых исследований. Затем можно нажимать на кнопку Исследования.\n"
         "/help - Показать это сообщение с доступными командами.\n"
+        "/csv - Видео-пример, как работать с <b>csv</b> файлом.\n"
     )
     await message.answer(help_text, parse_mode='HTML')
+
+
+# Обработчик команды /csv
+@dp.message_handler(commands=['csv'])
+async def send_video(message: types.Message):
+    video_path = 'media/video/example_csv.mp4'
+
+    if os.path.exists(video_path) and os.path.getsize(video_path) <= 50 * 1024 * 1024:  # 50 МБ
+        with open(video_path, 'rb') as video:
+            await message.answer("Держите видео-пример, подождите несколько секунд...")
+            await message.answer_video(video)
+    else:
+        await message.answer("Файл слишком большой или не найден.")
 
 
 @dp.message_handler(Text(equals=['ℹ️ О нас']))
@@ -67,8 +83,6 @@ async def send_info(message):
 @dp.message_handler(Text(equals=['❓ Помощь']))
 async def help_send(message):
     await message.answer('<b>Если есть вопросы</b>', parse_mode='HTML', reply_markup=buy_kb)
-
-# ----------------------------------------------------
 
 
 @dp.message_handler(commands=['parse'])
