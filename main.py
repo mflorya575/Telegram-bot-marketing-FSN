@@ -66,8 +66,8 @@ async def handle_file(message: types.Message):
         dates = data.columns.values[1:]  # Первый столбец пропускаем, если это не даты
         values = data.iloc[:, 1:].values  # Берем все строки, начиная со второго столбца
 
-        # Создаем фигуру для дашборда с двумя графиками
-        fig, axs = plt.subplots(2, 1, figsize=(10, 12))
+        # Создаем фигуру для дашборда с тремя графиками
+        fig, axs = plt.subplots(3, 1, figsize=(10, 18))
 
         # Первый график: линейная диаграмма
         for i, row in enumerate(values):
@@ -85,6 +85,11 @@ async def handle_file(message: types.Message):
         axs[1].set_title('Столбчатая диаграмма суммарных значений по датам')
         axs[1].set_xlabel('Даты')
         axs[1].set_ylabel('Сумма значений')
+
+        # Третий график: круговая диаграмма (Pie Chart)
+        total_values = summed_values  # Используем суммы значений для круговой диаграммы
+        axs[2].pie(total_values, labels=dates, autopct='%1.1f%%', startangle=90)
+        axs[2].set_title('Круговая диаграмма распределения значений по датам')
 
         # Сохраняем дашборд в байтовый объект для отправки
         dashboard_stream = io.BytesIO()
