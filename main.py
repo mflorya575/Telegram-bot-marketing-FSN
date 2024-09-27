@@ -16,14 +16,14 @@ from sklearn.tree import DecisionTreeClassifier, plot_tree, DecisionTreeRegresso
 import requests as requests
 from bs4 import BeautifulSoup
 
-from config import TOKEN
+from dotenv import find_dotenv, load_dotenv
 from keyboards import *
 import texts
 
 
-api = TOKEN
+load_dotenv(find_dotenv())
 logging.basicConfig(level=logging.INFO)
-bot = Bot(token=api)
+bot = Bot(token=os.getenv('TOKEN'))
 dp = Dispatcher(bot, storage=MemoryStorage())
 
 # Список для хранения ссылок на статьи
