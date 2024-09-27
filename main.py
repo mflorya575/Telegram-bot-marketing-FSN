@@ -16,11 +16,12 @@ from sklearn.tree import DecisionTreeClassifier, plot_tree, DecisionTreeRegresso
 import requests as requests
 from bs4 import BeautifulSoup
 
+from config import TOKEN
 from keyboards import *
 import texts
 
 
-api = '7793599961:AAF9TpoAN_-gBdbV4q_-I02M0xU_FX8L2Ik'
+api = TOKEN
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=api)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -80,7 +81,7 @@ async def send_video(message: types.Message):
 # Обработчик команды /excel
 @dp.message_handler(commands=['excel'])
 async def send_video(message: types.Message):
-    video_path = 'media/video/example_excel.mp4'
+    video_path = 'media/video/example_excelgit.mp4'
 
     if os.path.exists(video_path) and os.path.getsize(video_path) <= 50 * 1024 * 1024:  # 50 МБ
         with open(video_path, 'rb') as video:
