@@ -81,7 +81,7 @@ async def send_video(message: types.Message):
 # Обработчик команды /excel
 @dp.message_handler(commands=['excel'])
 async def send_video(message: types.Message):
-    video_path = 'media/video/example_excelgit.mp4'
+    video_path = 'media/video/example_excel.mp4'
 
     if os.path.exists(video_path) and os.path.getsize(video_path) <= 50 * 1024 * 1024:  # 50 МБ
         with open(video_path, 'rb') as video:
@@ -164,7 +164,7 @@ def get_catalog_keyboard():
 @dp.message_handler(Text(equals=['📊 Исследования']))
 async def send_price_list(message: types.Message):
     if not article_links:
-        await message.answer('Ссылки на статьи пока недоступны. Попробуйте позже.')
+        await message.answer('Ссылки на статьи пока недоступны. Выполните команду /parse.')
     else:
         await message.answer('<b>Выберите интересующую вас статью</b>', parse_mode='HTML',
                              reply_markup=get_catalog_keyboard())
