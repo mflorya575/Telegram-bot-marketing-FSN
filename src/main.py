@@ -1,25 +1,22 @@
-import aiohttp
-from aiogram import Bot, Dispatcher, executor, types
-import asyncio
+#!/usr/bin/env python
+
+import io
 import logging
-from aiogram.dispatcher.filters import Command, Text
-from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.dispatcher import FSMContext
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import os
 
-import pandas as pd
+import aiohttp
 import matplotlib.pyplot as plt
-import io
-from sklearn.tree import DecisionTreeClassifier, plot_tree, DecisionTreeRegressor
-import requests as requests
+import pandas as pd
+from aiogram import Bot, Dispatcher, executor, types
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.dispatcher.filters import Text
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from bs4 import BeautifulSoup
-
 from dotenv import find_dotenv, load_dotenv
-from keyboards import *
-import texts
+from sklearn.tree import plot_tree, DecisionTreeRegressor
 
+import texts
+import keyboards as kb
 
 load_dotenv(find_dotenv())
 logging.basicConfig(level=logging.INFO)
@@ -35,7 +32,7 @@ URL = "https://www.sostav.ru/news/marketing"
 
 @dp.message_handler(commands=['start'])
 async def start(message):
-    await message.answer(f'✅ Добро пожаловать!\n\n' + texts.start, reply_markup=start_kb)
+    await message.answer(f'✅ Добро пожаловать!\n\n' + texts.start, reply_markup=kb.start_kb)
 
 
 @dp.message_handler(Text(equals=['📋 Меню']))
@@ -48,7 +45,7 @@ async def send_menu(message: types.Message):
         "/help - Показать это сообщение с доступными командами.\n"
         "/csv - Видео-пример, как работать с <b>csv</b> файлом.\n"
         "/excel - Видео-пример, как работать с <b>excel</b> файлом.\n",
-        reply_markup=start_kb, parse_mode='HTML'
+        reply_markup=kb.start_kb, parse_mode='HTML'
     )
 
 
@@ -93,12 +90,12 @@ async def send_video(message: types.Message):
 
 @dp.message_handler(Text(equals=['ℹ️ О нас']))
 async def send_info(message):
-    await message.answer(texts.about_as, parse_mode='HTML', reply_markup=start_kb)
+    await message.answer(texts.about_as, parse_mode='HTML', reply_markup=kb.start_kb)
 
 
 @dp.message_handler(Text(equals=['❓ Помощь']))
 async def help_send(message):
-    await message.answer('<b>Если есть вопросы</b>', parse_mode='HTML', reply_markup=buy_kb)
+    await message.answer('<b>Если есть вопросы</b>', parse_mode='HTML', reply_markup=kb.buy_kb)
 
 
 @dp.message_handler(commands=['parse'])
@@ -136,9 +133,13 @@ async def parse_new_articles():
                     # Очищаем старые ссылки и обновляем их новыми
                     article_links = []
                     for article in articles[:10]:  # Возьмем первые 10 статей
-                        title = article.get_text(strip=True)  # Получаем заголовок статьи, очищая лишние пробелы
+                        title = article.get_text(
+                            strip=True
+                        )  # Получаем заголовок статьи, очищая лишние пробелы
                         # Проверяем, начинается ли ссылка с 'http'
-                        link = article['href'] if article['href'].startswith('http') else URL + article['href']
+                        link = article['href'] if article['href'].startswith('http') else URL + \
+                                                                                          article[
+                                                                                              'href']
 
                         # Заменяем 'news/marketing' на 'publication/' в ссылке
                         if 'news/marketing' in link:
@@ -154,9 +155,9 @@ async def parse_new_articles():
 
 # Функция для создания клавиатуры с новыми ссылками
 def get_catalog_keyboard():
-    catalog_kb = InlineKeyboardMarkup()
+    catalog_kb = kb.InlineKeyboardMarkup()
     for title, link in article_links:
-        catalog_kb.add(InlineKeyboardButton(text=title, url=link))
+        catalog_kb.add(kb.InlineKeyboardButton(text=title, url=link))
     return catalog_kb
 
 
@@ -166,8 +167,10 @@ async def send_price_list(message: types.Message):
     if not article_links:
         await message.answer('Ссылки на статьи пока недоступны. Выполните команду /parse.')
     else:
-        await message.answer('<b>Выберите интересующую вас статью</b>', parse_mode='HTML',
-                             reply_markup=get_catalog_keyboard())
+        await message.answer(
+            '<b>Выберите интересующую вас статью</b>', parse_mode='HTML',
+            reply_markup=get_catalog_keyboard()
+        )
 
 
 # Запуск парсера с периодичностью в 1 час
@@ -176,7 +179,8 @@ async def on_startup(dp):
     scheduler.add_job(parse_new_articles, 'interval', hours=1)  # Парсим сайт раз в час
     scheduler.start()
 
-#------------------------------------------------------
+
+# ------------------------------------------------------
 
 
 @dp.message_handler(content_types=[types.ContentType.DOCUMENT])
@@ -296,8 +300,9 @@ async def handle_file(message: types.Message):
                 plt.close(fig)  # Закрываем фигуру дерева решений
 
     # Проверяем, что файл - это Excel
-    elif message.document.mime_type in ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                                         'application/vnd.ms-excel']:
+    elif message.document.mime_type in [
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-excel']:
         # Чтение файла Excel в pandas
         data = pd.read_excel(io.BytesIO(file.read()), header=0)
 
